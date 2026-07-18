@@ -1,0 +1,1000 @@
+:root {
+  /* 화면 전체는 화이트/뉴트럴 캔버스 + 컬러는 한 가지만 확신 있게 쓰고,
+     그라데이션은 "결과 카드"라는 단 한 순간을 위해 아껴둔다. */
+  --color-bg: #fff8f2;
+  --color-surface: #ffffff;
+  --color-surface-alt: #fff1e8;
+  --color-text: #221c2b;
+  --color-text-muted: #8a8194;
+  --color-border: #f0e6dd;
+
+  --color-primary: #ff3b5c;
+  --color-primary-dark: #d81e42;
+  --color-primary-soft: #ffe1e8;
+
+  --color-accent: #6d4aff;
+  --color-accent-soft: #ece6ff;
+
+  --color-warn: #ff9a3c;
+  --color-warn-soft: #fff1d6;
+
+  --color-success: #17c98d;
+  --color-success-soft: #dbfbef;
+
+  /* 이 그라데이션은 결과 카드 전용. 그 외 화면에는 쓰지 않는다. */
+  --gradient-hero: linear-gradient(135deg, #ff3b5c 0%, #ff9a4d 55%, #6d4aff 100%);
+
+  --radius-lg: 24px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+
+  --shadow-card: 0 1px 2px rgba(34, 28, 43, 0.04), 0 8px 20px rgba(34, 28, 43, 0.06);
+  --shadow-pop: 0 8px 20px rgba(255, 59, 92, 0.28);
+
+  font-family: "Gowun Dodum", "Pretendard", -apple-system, BlinkMacSystemFont, sans-serif;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100dvh;
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  background-color: var(--color-bg);
+  background-image: radial-gradient(rgba(255, 59, 92, 0.08) 1.4px, transparent 1.4px);
+  background-size: 22px 22px;
+}
+
+#root {
+  min-height: 100dvh;
+}
+
+h1,
+h2,
+h3 {
+  font-family: "Black Han Sans", "Gowun Dodum", sans-serif;
+  font-weight: 400;
+  margin: 0;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+p {
+  margin: 0;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input,
+select {
+  font-family: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+/* ---------- layout ---------- */
+
+.page {
+  min-height: 100dvh;
+  width: 100%;
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 20px 48px;
+}
+
+.page-narrow {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* 모임 화면/팀 허브처럼 화면이 넓을 때 더 쓸 수 있게 하는 컨테이너.
+   모바일에서는 page-narrow와 동일하게 보이고, 태블릿/데스크톱에서 넓어진다. */
+.page-wide {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.meeting-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.meeting-main {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.meeting-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.meeting-card {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  padding: 16px 18px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.meeting-card:active {
+  transform: scale(0.98);
+}
+
+.meeting-card-badge {
+  position: absolute;
+  top: -8px;
+  right: 14px;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.meeting-card-dest {
+  font-family: "Black Han Sans", sans-serif;
+  font-size: 17px;
+  color: var(--color-text);
+}
+
+.meeting-card-time {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text);
+  margin-bottom: 4px;
+  justify-content: center;
+  text-align: center;
+}
+
+.brand-mark {
+  width: 28px;
+  height: 34px;
+  flex-shrink: 0;
+}
+
+.brand h1 {
+  font-size: 30px;
+  background: var(--gradient-hero);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand span {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.tagline {
+  color: var(--color-text-muted);
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+
+/* ---------- surfaces ---------- */
+
+.panel {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  padding: 24px 20px;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel h2 {
+  font-size: 20px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.field input,
+.field select {
+  border: 1.5px solid var(--color-border);
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 16px;
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.field input:focus,
+.field select:focus {
+  border-color: var(--color-primary);
+}
+
+.field-hint {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.field-error {
+  font-size: 13px;
+  color: var(--color-primary-dark);
+  font-weight: 700;
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+  border: none;
+  border-radius: 999px;
+  padding: 15px 20px;
+  font-size: 15px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.15s ease, background 0.15s ease;
+  width: 100%;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: var(--shadow-pop);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+
+.btn-secondary {
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1.5px solid var(--color-border);
+}
+
+.btn-accent {
+  background: var(--color-accent);
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(109, 74, 255, 0.24);
+}
+
+.btn-ghost {
+  background: var(--color-surface-alt);
+  color: var(--color-text);
+  border: 1.5px solid transparent;
+}
+
+.btn-danger {
+  background: transparent;
+  color: #b3261e;
+  border: 1.5px solid #ffd4d1;
+  width: auto;
+  padding: 10px 18px;
+  font-size: 13px;
+}
+
+.danger-zone {
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.btn-lg {
+  padding: 18px 24px;
+  font-size: 17px;
+  border-radius: var(--radius-md);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.btn-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-row .btn {
+  width: auto;
+  flex: 1 1 140px;
+}
+
+/* ---------- home ---------- */
+
+.home-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.hero-cluster {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.hero-cluster-item {
+  display: inline-block;
+}
+
+.hero-cluster-runner {
+  font-size: 60px;
+  animation: float 2.6s ease-in-out infinite;
+}
+
+.hero-cluster-clock {
+  font-size: 34px;
+  animation: float-clock 2.6s ease-in-out infinite 0.3s;
+}
+
+.hero-cluster-turtle {
+  font-size: 30px;
+  animation: float-turtle 2.6s ease-in-out infinite 0.6s;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes float-clock {
+  0%,
+  100% {
+    transform: rotate(-12deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-12deg) translateY(-8px);
+  }
+}
+
+@keyframes float-turtle {
+  0%,
+  100% {
+    transform: rotate(8deg) translateY(0);
+  }
+  50% {
+    transform: rotate(8deg) translateY(-8px);
+  }
+}
+
+/* ---------- scoreboard ---------- */
+
+.group-header {
+  color: var(--color-text);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.group-header .dest {
+  font-size: 21px;
+  font-family: "Black Han Sans", sans-serif;
+}
+
+.group-header .meta {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.room-code-chip {
+  align-self: center;
+  background: var(--color-surface-alt);
+  border: 1px dashed var(--color-border);
+  color: var(--color-text-muted);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+
+/* ---------- live map ---------- */
+
+.map-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.map-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  padding-left: 2px;
+}
+
+.live-map {
+  width: 100%;
+  height: 220px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+}
+
+.map-placeholder {
+  width: 100%;
+  min-height: 96px;
+  border-radius: var(--radius-md);
+  border: 1.5px dashed var(--color-border);
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 16px;
+}
+
+/* ---------- destination picker ---------- */
+
+.dest-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dest-search {
+  display: flex;
+  gap: 8px;
+}
+
+.dest-search input {
+  flex: 1;
+  min-width: 0;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 15px;
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.dest-search input:focus {
+  border-color: var(--color-primary);
+}
+
+.dest-search .btn {
+  width: auto;
+  padding: 12px 18px;
+  flex-shrink: 0;
+}
+
+.dest-results {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dest-results li button {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  text-align: left;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.dest-results li button:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.dest-result-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.dest-result-addr {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.dest-map {
+  width: 100%;
+  height: 200px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  cursor: crosshair;
+}
+
+.scoreboard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.score-row {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-card);
+}
+
+.score-row.me {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.score-rank {
+  font-family: "Black Han Sans", sans-serif;
+  font-size: 18px;
+  width: 28px;
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.score-status-emoji {
+  font-size: 24px;
+  width: 34px;
+  text-align: center;
+}
+
+.score-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.score-name {
+  font-weight: 700;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.score-name .me-tag {
+  font-size: 11px;
+  background: var(--color-primary);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+.score-detail {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.score-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.badge-arrived {
+  background: var(--color-success-soft);
+  color: #0a9169;
+}
+
+.badge-en_route {
+  background: var(--color-warn-soft);
+  color: #b6710a;
+}
+
+.badge-not_checked_in {
+  background: var(--color-surface-alt);
+  color: var(--color-text-muted);
+}
+
+.checkin-zone {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 18px;
+  text-align: center;
+  color: var(--color-text);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.checkin-zone .countdown {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.checkin-error {
+  background: #fff0f0;
+  color: #b3261e;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ---------- result card (유일하게 화려한 순간) ---------- */
+
+.card-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 14, 24, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 50;
+  overflow-y: auto;
+}
+
+.card-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.result-card {
+  width: 320px;
+  aspect-ratio: 9 / 16;
+  border-radius: 24px;
+  background: var(--gradient-hero);
+  color: #fff;
+  padding: 22px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+}
+
+/* 지각 정도별 테마 컬러 — 결과 카드는 앱에서 유일하게 화려한 순간이라 다양하게.
+   2단 그래디언트로 채도를 확실히 줘서 파스텔처럼 흐릿해지지 않게 한다. */
+.result-card.rc-theme-gold {
+  background: linear-gradient(135deg, #ffc02e 0%, #ff7a18 100%);
+}
+.result-card.rc-theme-coral {
+  background: linear-gradient(135deg, #ff3b5c 0%, #ff7a18 100%);
+}
+.result-card.rc-theme-magenta {
+  background: linear-gradient(135deg, #ff2e7e 0%, #7a1fff 100%);
+}
+.result-card.rc-theme-midnight {
+  background: linear-gradient(135deg, #4b1fa6 0%, #14092b 100%);
+}
+.result-card.rc-theme-sky {
+  background: linear-gradient(135deg, #12b6d6 0%, #2e5cff 100%);
+}
+.result-card.rc-theme-ember {
+  background: linear-gradient(135deg, #ff5a1f 0%, #ff2e7e 100%);
+}
+
+.result-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 85% 8%, rgba(255, 255, 255, 0.2), transparent 45%);
+  pointer-events: none;
+}
+
+.rc-sticker-sparkle {
+  position: absolute;
+  z-index: 2;
+  top: 20px;
+  right: 20px;
+  font-size: 20px;
+  pointer-events: none;
+  animation: sparkle-spin 3s linear infinite;
+}
+
+@keyframes sparkle-spin {
+  0%,
+  100% {
+    transform: rotate(-8deg) scale(1);
+  }
+  50% {
+    transform: rotate(8deg) scale(1.15);
+  }
+}
+
+.result-card .rc-brand {
+  font-family: "Black Han Sans", sans-serif;
+  font-size: 15px;
+  letter-spacing: 1px;
+  opacity: 0.95;
+  flex-shrink: 0;
+}
+
+/* 지도가 있으면 이모지 자리 자체를 지도로 대체하는 히어로 영역 */
+.rc-hero {
+  flex: 1;
+  min-height: 90px;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+}
+
+.rc-hero-emoji-only {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rc-hero-emoji-only .rc-emoji {
+  font-size: 58px;
+}
+
+.rc-hero-map {
+  width: 100%;
+  height: 100%;
+  border: 3px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.rc-hero-map-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+/* 지도 타일이 로드되기 전엔 로딩 표시로, PNG 캡처 시에는(지도 레이어가 제외되므로)
+   최종 대체 이미지로 쓰이는 이모지 레이어. 항상 지도 뒤에 깔려있다. */
+.rc-hero-map-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44px;
+}
+
+.rc-hero-map-pin {
+  position: absolute;
+  z-index: 3;
+  left: 8px;
+  bottom: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 999px;
+  max-width: calc(100% - 16px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.result-card .rc-headline {
+  font-family: "Black Han Sans", sans-serif;
+  font-size: 21px;
+  text-align: center;
+  line-height: 1.3;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
+}
+
+.result-card .rc-caption {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  padding: 9px 12px;
+  flex-shrink: 0;
+}
+
+.result-card .rc-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.result-card .rc-stat {
+  flex: 1;
+  min-width: 0;
+  background: #fff;
+  border-radius: 14px;
+  padding: 9px 4px;
+  text-align: center;
+}
+
+.result-card .rc-stat b {
+  display: block;
+  font-size: 15px;
+  font-family: "Black Han Sans", sans-serif;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.result-card .rc-stat span {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.result-card .rc-footer {
+  text-align: center;
+  font-size: 10px;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+/* ---------- misc ---------- */
+
+.center-text {
+  text-align: center;
+}
+
+.muted-white {
+  color: var(--color-text-muted);
+  text-align: center;
+  font-size: 14px;
+}
+
+.spinner-text {
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.divider-or {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-text-muted);
+  font-size: 12px;
+}
+
+.divider-or::before,
+.divider-or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.link-back {
+  color: var(--color-text-muted);
+  font-size: 14px;
+  text-align: center;
+  text-decoration: underline;
+}
+
+/* ---------- responsive (태블릿/데스크톱) ---------- */
+
+@media (min-width: 480px) {
+  .page {
+    padding-top: 48px;
+  }
+}
+
+@media (min-width: 640px) {
+  .page-narrow,
+  .page-wide {
+    max-width: 520px;
+  }
+
+  .meeting-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .page-wide {
+    max-width: 800px;
+  }
+
+  .result-card {
+    width: 360px;
+  }
+
+  .meeting-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    align-items: start;
+    gap: 20px;
+  }
+
+  .live-map {
+    height: 280px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .page {
+    padding: 48px 32px 64px;
+  }
+
+  .page-wide {
+    max-width: 1020px;
+  }
+
+  .meeting-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

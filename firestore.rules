@@ -1,0 +1,61 @@
+rules_version = '2';
+
+// Odijjm은 회원가입 없이 익명 인증(Firebase Anonymous Auth)만으로 동작한다.
+// 로그인은 필요하지만(request.auth != null) 누구나 방 코드만 알면 팀에 읽기/쓰기가 가능하다.
+// 각 참여자 문서는 uid를 문서 ID로 쓰기 때문에, 본인 uid로만 자기 체크인을 쓸 수 있도록 제한한다.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /teams/{teamCode} {
+      allow read: if true;
+      allow create: if request.auth != null && request.resource.data.creatorUid == request.auth.uid;
+      allow update: if false;
+      // 팀 삭제는 생성자만 가능 (연쇄 삭제되는 meetings/participants도 아래에서 각각 허용해야 함).
+      allow delete: if request.auth != null && request.auth.uid == resource.data.creatorUid;
+
+      match /meetings/{meetingId} {
+        allow read: if true;
+        allow create: if request.auth != null && request.resource.data.keys().hasAll(
+          ['destinationName', 'destinationLat', 'destinationLng', 'meetingTime']
+        );
+        // memberUids는 "본인 uid 하나를 추가" 또는 "본인 uid 하나를 제거"하는 변경만 허용한다
+        // (참여할 때 / 팀 나가기할 때). 다른 필드나 남의 멤버십은 못 건드린다.
+        allow update: if request.auth != null
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberUids'])
+          && (
+            (request.resource.data.memberUids.hasAll(resource.data.memberUids)
+              && request.resource.data.memberUids.size() == resource.data.memberUids.size() + 1
+              && request.auth.uid in request.resource.data.memberUids)
+            ||
+            (resource.data.memberUids.hasAll(request.resource.data.memberUids)
+              && request.resource.data.memberUids.size() == resource.data.memberUids.size() - 1
+              && request.auth.uid in resource.data.memberUids
+              && !(request.auth.uid in request.resource.data.memberUids))
+          );
+        // 모임 삭제는 (연쇄삭제 상황인) 팀 생성자만 — 팀 문서를 조회해서 확인한다.
+        allow delete: if request.auth != null
+          && request.auth.uid == get(/databases/$(database)/documents/teams/$(teamCode)).data.creatorUid;
+
+        match /participants/{uid} {
+          allow read: if true;
+          allow create: if request.auth != null && request.auth.uid == uid
+            && request.resource.data.uid == uid
+            && request.resource.data.keys().hasAll(['uid', 'nickname', 'status']);
+          // "도착" 확정 이후에는 lastCheckIn/status를 더 이상 못 바꾼다 (지각 판정 고정).
+          // 닉네임 변경(다른 모임 재참여 시)은 도착 여부와 무관하게 계속 허용한다.
+          allow update: if request.auth != null && request.auth.uid == uid
+            && (
+              resource.data.status == 'arrived'
+                ? request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nickname'])
+                : request.resource.data.diff(resource.data).affectedKeys()
+                    .hasOnly(['lastCheckIn', 'status', 'nickname'])
+            );
+          // 본인이 팀 나가기로 자기 참여 기록을 지우거나, 팀 생성자가 팀 삭제로 연쇄 삭제할 때.
+          allow delete: if request.auth != null && (
+            request.auth.uid == uid
+            || request.auth.uid == get(/databases/$(database)/documents/teams/$(teamCode)).data.creatorUid
+          );
+        }
+      }
+    }
+  }
+}
