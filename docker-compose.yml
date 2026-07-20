@@ -35,6 +35,31 @@ services:
       # (예: Cloudflare Tunnel로 localhost:8081을 외부에 공개 — HTTPS는 프록시/터널 쪽이 처리).
       - "8081:80"
     restart: unless-stopped
+    depends_on:
+      - render
+
+  # 결과 카드를 헤드리스 브라우저로 직접 열어 스크린샷 찍어주는 서비스.
+  # 카카오맵 타일은 CORS 헤더가 없어 브라우저 안에서 canvas로 캡처가 불가능해서
+  # (html-to-image가 못 찍음) 실제 브라우저 렌더링 결과를 그대로 이미지로 떠서 돌려준다.
+  render:
+    build:
+      context: ./render-service
+      dockerfile: Dockerfile
+    environment:
+      # 카카오맵 JS 키가 특정 도메인(실제 배포 도메인)에만 등록돼 있어서, 렌더 서비스가 내부
+      # 도커 네트워크 주소(http://web)로 들어가면 카카오가 도메인 불일치로 지도 로드를 거부한다.
+      # 그래서 컨테이너 내부에서도 반드시 실제 공개 도메인으로 나갔다 들어와야 한다.
+      - WEB_ORIGIN=${PUBLIC_ORIGIN:-http://web}
+    restart: unless-stopped
+
+# 이 VM의 실제 네트워크 인터페이스 MTU가 1450인데(클라우드 오버레이 네트워크라 표준 1500보다 작음)
+# 도커 기본 브리지 네트워크는 그걸 모르고 1500을 그대로 써서, 커다란 패킷(TLS 핸드셰이크 등)이
+# 컨테이너 밖으로 나가다 조용히 버려진다 — DNS 같은 작은 요청은 되는데 HTTPS 요청만 계속 멈추는
+# 증상으로 나타난다. render 컨테이너가 카카오맵 CDN에 못 붙던 원인이 이거였다.
+networks:
+  default:
+    driver_opts:
+      com.docker.network.driver.mtu: 1450
 
 volumes:
   node_modules:

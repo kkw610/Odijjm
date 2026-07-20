@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import HomePage from "./pages/HomePage.jsx";
 import CreateGroupPage from "./pages/CreateGroupPage.jsx";
 import JoinPage from "./pages/JoinPage.jsx";
@@ -13,13 +13,17 @@ import { bumpMetric } from "./services/metrics";
 
 export default function App() {
   const { uid, error } = useAuth();
+  const location = useLocation();
   const visitBumpedRef = useRef(false);
 
+  // /stats는 지표를 "보러 가는" 페이지지 서비스를 "쓰러 오는" 방문이 아니라서 방문수에서 뺀다.
+  // 세션 중 처음 도착한 곳이 /stats면 넘어갔다가, 다른 페이지로 이동하는 순간 그때 한 번 집계한다.
   useEffect(() => {
     if (!uid || visitBumpedRef.current) return;
+    if (location.pathname === "/stats") return;
     visitBumpedRef.current = true;
     bumpMetric("visits");
-  }, [uid]);
+  }, [uid, location.pathname]);
 
   if (error) {
     return (

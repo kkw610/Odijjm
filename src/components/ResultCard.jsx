@@ -110,7 +110,7 @@ const ResultCard = forwardRef(function ResultCard(
       </div>
 
       <div className="rc-footer">
-        {nickname} · {meeting.destinationName} · #오디쯤 #지각왕카드
+        {nickname} · {meeting.destinationName} · #어디쯤 #지각왕카드
       </div>
     </div>
   );

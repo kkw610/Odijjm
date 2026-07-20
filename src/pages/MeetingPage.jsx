@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
 import {
   getTeam,
   subscribeToMeeting,
@@ -72,6 +72,7 @@ function geoErrorMessage(err) {
 
 export default function MeetingPage({ uid }) {
   const { teamCode, meetingId } = useParams();
+  const [searchParams] = useSearchParams();
   const [team, setTeam] = useState(undefined); // undefined = loading, null = not found
   const [meeting, setMeeting] = useState(undefined); // undefined = loading, null = not found
   const [participants, setParticipants] = useState([]);
@@ -132,6 +133,14 @@ export default function MeetingPage({ uid }) {
     const interval = setInterval(() => setNow(Date.now()), 5000);
     return () => clearInterval(interval);
   }, []);
+
+  // 결과 카드를 서버(헤드리스 브라우저)에서 캡처할 때 쓰는 진입점 — ?showCard=<참여자uid>로 들어오면
+  // 그 사람 카드를 자동으로 띄운다. 결과 카드는 팀 스코어보드에 이미 공개된 정보라 "내 카드만" 제한을
+  // 여기선 두지 않는다 (render-service 전용, 일반 UI에서는 여전히 본인 카드 버튼만 노출).
+  useEffect(() => {
+    const wantedId = searchParams.get("showCard");
+    if (wantedId) setShowCardForId(wantedId);
+  }, [searchParams]);
 
   // 같은 팀에서 이미 닉네임을 쓴 적 있으면, 새 모임이 열려도 다시 묻지 않고 조용히 참여시킨다.
   useEffect(() => {
@@ -460,6 +469,8 @@ export default function MeetingPage({ uid }) {
           participant={cardParticipant}
           rank={cardRank}
           total={cardTotal}
+          teamCode={teamCode}
+          meetingId={meeting.id}
           onClose={() => setShowCardForId(null)}
         />
       )}
