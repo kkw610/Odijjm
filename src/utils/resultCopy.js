@@ -50,50 +50,26 @@ const VERY_LATE = {
   captions: ["오늘의 벌칙자 확정", "다음부턴 1시간 일찍 부를게", "전설의 지각... 박제 완료"],
 };
 
-const EN_ROUTE_EARLY = {
-  emoji: "🚶",
-  theme: "sky",
-  headlines: ["부지런 그 자체 🚶", "여유롭게 이동 중", "일찍 출발한 사람 티내는 중"],
-  captions: ["아직 시간 넉넉함", "이대로만 가면 칼도착 각", "천천히 와도 됨"],
-};
-
-const EN_ROUTE_LATE = {
-  emoji: "💦",
-  theme: "ember",
-  headlines: ["지각 확정, 그래도 가는 중 🏃‍♂️💦", "숨차게 뛰는 중...", "이미 늦었지만 포기는 없다"],
-  captions: ["도착하면 바로 카드 갱신 가능", "친구들이 기다리는 중", "택시 타는 걸 추천함"],
-};
-
 function resolveHeadline(bucket, n) {
   const list = typeof bucket.headlines === "function" ? bucket.headlines(n) : bucket.headlines;
   return pick(list);
 }
 
-export function buildResultContent({ status, lateMinutes, distanceMeters, etaMinutes }) {
+// 결과 카드는 "도착 확정"된 사람한테만 보여준다 (MeetingPage에서 status==='arrived'일 때만 열림).
+// 그래서 여기선 항상 도착 기준 문구만 고르면 된다 — 지각 정도(lateMinutes)만 보고 버킷을 정한다.
+export function buildResultContent({ lateMinutes, distanceMeters, etaMinutes }) {
   let bucket;
-
-  if (status === "arrived") {
-    if (lateMinutes <= 0) bucket = ON_TIME;
-    else if (lateMinutes <= 5) bucket = SLIGHT_LATE;
-    else if (lateMinutes <= 15) bucket = LATE;
-    else bucket = VERY_LATE;
-  } else {
-    bucket = lateMinutes <= 0 ? EN_ROUTE_EARLY : EN_ROUTE_LATE;
-  }
+  if (lateMinutes <= 0) bucket = ON_TIME;
+  else if (lateMinutes <= 5) bucket = SLIGHT_LATE;
+  else if (lateMinutes <= 15) bucket = LATE;
+  else bucket = VERY_LATE;
 
   const headline = resolveHeadline(bucket, Math.max(lateMinutes, 0));
   const caption = pick(bucket.captions);
 
   // 스탯 박스에 짧게 들어갈 값/라벨 (긴 문장을 넣으면 박스 밖으로 넘침)
-  let resultValue;
-  let resultLabel;
-  if (status === "arrived") {
-    resultValue = lateMinutes <= 0 ? "정시" : `${lateMinutes}분`;
-    resultLabel = lateMinutes <= 0 ? "도착 완료" : "지각 도착";
-  } else {
-    resultValue = lateMinutes <= 0 ? "이동중" : `${lateMinutes}분`;
-    resultLabel = lateMinutes <= 0 ? "여유 있음" : "지각 중";
-  }
+  const resultValue = lateMinutes <= 0 ? "정시" : `${lateMinutes}분`;
+  const resultLabel = lateMinutes <= 0 ? "도착 완료" : "지각 도착";
 
   return {
     emoji: bucket.emoji,

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import BrandLogo from "../components/BrandLogo.jsx";
+import JoinedRoomsList from "../components/JoinedRoomsList.jsx";
+import { bumpMetric } from "../services/metrics";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -29,7 +31,13 @@ export default function HomePage() {
         </p>
 
         <div className="panel">
-          <button className="btn btn-primary btn-lg" onClick={() => navigate("/create")}>
+          <button
+            className="btn btn-primary btn-lg"
+            onClick={() => {
+              bumpMetric("createClicks");
+              navigate("/create");
+            }}
+          >
             🎉 모임 만들기
           </button>
 
@@ -49,6 +57,8 @@ export default function HomePage() {
             </button>
           </form>
         </div>
+
+        <JoinedRoomsList />
       </div>
     </div>
   );

@@ -577,6 +577,39 @@ a {
   cursor: crosshair;
 }
 
+/* ---------- stats page ---------- */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.stat-tile {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-top: 3px solid var(--tile-accent, var(--color-primary));
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.stat-tile-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.stat-tile-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text);
+  font-variant-numeric: proportional-nums;
+}
+
 .scoreboard {
   display: flex;
   flex-direction: column;

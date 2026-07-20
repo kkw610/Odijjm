@@ -1,5 +1,7 @@
 import { useRef, useState } from "react";
 import { toPng } from "html-to-image";
+import { track } from "../services/analytics";
+import { bumpMetric } from "../services/metrics";
 import ResultCard from "./ResultCard.jsx";
 
 export default function ResultCardModal({ nickname, meeting, participant, rank, total, onClose }) {
@@ -20,6 +22,8 @@ export default function ResultCardModal({ nickname, meeting, participant, rank, 
       link.download = `odijjm-${nickname}.png`;
       link.href = dataUrl;
       link.click();
+      track("download_card");
+      bumpMetric("cardDownloads");
     } catch (err) {
       console.error("카드 저장 실패", err);
       alert("카드 저장에 실패했어요. 스크린샷으로 저장해주세요!");

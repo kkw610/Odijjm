@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { getTeam, subscribeToMeetings, getLatestMeeting, deleteTeam, leaveTeam } from "../services/teamService";
-import { clearMyNickname } from "../utils/localIdentity";
+import { clearMyNickname, recordVisitedTeam, removeJoinedTeam } from "../utils/localIdentity";
 
 function formatMeetingTime(iso) {
   const d = new Date(iso);
@@ -26,6 +26,7 @@ export default function TeamHubPage({ uid }) {
     let cancelled = false;
     getTeam(teamCode).then((t) => {
       if (!cancelled) setTeam(t);
+      if (t) recordVisitedTeam(teamCode);
     });
     const unsub = subscribeToMeetings(teamCode, uid, setMeetings);
     return () => {
@@ -33,6 +34,11 @@ export default function TeamHubPage({ uid }) {
       unsub();
     };
   }, [teamCode, uid]);
+
+  useEffect(() => {
+    if (!meetings || meetings.length === 0) return;
+    recordVisitedTeam(teamCode, { destinationName: meetings[0].destinationName, meetingTime: meetings[0].meetingTime });
+  }, [teamCode, meetings]);
 
   // 아직 이 팀의 어떤 모임에도 참여한 적 없는 신규 초대자를 위해, 방 코드만으로 "지금 잡힌 모임"
   // 하나를 찾아서 보여준다 (과거 전체 목록이 아니라 최신 모임 1개만 — subscribeToMeetings 참고).
@@ -55,6 +61,7 @@ export default function TeamHubPage({ uid }) {
     setError("");
     try {
       await deleteTeam(teamCode, uid);
+      removeJoinedTeam(teamCode);
       navigate("/");
     } catch (err) {
       setError(err.message || "삭제에 실패했어요. 다시 시도해주세요.");
@@ -71,6 +78,7 @@ export default function TeamHubPage({ uid }) {
     try {
       await leaveTeam(teamCode, uid);
       clearMyNickname(teamCode);
+      removeJoinedTeam(teamCode);
       navigate("/");
     } catch (err) {
       setError(err.message || "나가기에 실패했어요. 다시 시도해주세요.");
@@ -118,6 +126,9 @@ export default function TeamHubPage({ uid }) {
           </Link>
           <Link to={`/t/${teamCode}/new-meeting`} className="btn btn-primary">
             ➕ 새 모임 잡기
+          </Link>
+          <Link to="/join" className="btn btn-ghost">
+            🔑 다른 모임 참여
           </Link>
         </div>
 

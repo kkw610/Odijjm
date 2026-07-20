@@ -14,20 +14,19 @@ const ResultCard = forwardRef(function ResultCard(
   { nickname, meeting, participant, rank, total },
   ref
 ) {
-  const { lastCheckIn, status } = participant;
+  const { lastCheckIn } = participant;
   const lateMinutes = computeLateMinutes(lastCheckIn.checkedAt, meeting.meetingTime);
 
   // checkedAt을 키로 고정해 재렌더링될 때마다 문구가 바뀌지 않도록 한다.
   const content = useMemo(
     () =>
       buildResultContent({
-        status,
         lateMinutes,
         distanceMeters: lastCheckIn.distanceMeters,
         etaMinutes: lastCheckIn.etaMinutes,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [lastCheckIn.checkedAt, status]
+    [lastCheckIn.checkedAt]
   );
 
   const mapContainerRef = useRef(null);

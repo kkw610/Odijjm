@@ -19,7 +19,8 @@ function buildPin(text, bgColor) {
 export default function LiveMap({ destination, participants }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
-  const overlaysRef = useRef([]);
+  const destOverlayRef = useRef(null);
+  const overlaysByUidRef = useRef(new Map());
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
 
@@ -47,41 +48,57 @@ export default function LiveMap({ destination, participants }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 지각자 위치가 실시간(watchPosition)으로 몇 초 간격 계속 들어오기 때문에, 매번 setBounds를 다시
+  // 부르면 사용자가 확대/이동해둔 화면이 그때마다 초기화된다. 그래서 "누가 새로 지도에 뜨거나 빠질 때"만
+  // 화면을 다시 맞추고, 이미 떠 있는 핀은 위치만 조용히 옮긴다(setPosition).
   useEffect(() => {
     if (!ready || !window.kakao?.maps || !mapRef.current) return;
     const kakao = window.kakao;
 
-    overlaysRef.current.forEach((o) => o.setMap(null));
-    overlaysRef.current = [];
-
-    const bounds = new kakao.maps.LatLngBounds();
-    const destPos = new kakao.maps.LatLng(destination.lat, destination.lng);
-
-    const destOverlay = new kakao.maps.CustomOverlay({
-      position: destPos,
-      content: buildPin("🏁", "#221c2b"),
-      yAnchor: 0.5,
-    });
-    destOverlay.setMap(mapRef.current);
-    overlaysRef.current.push(destOverlay);
-    bounds.extend(destPos);
+    if (!destOverlayRef.current) {
+      const destPos = new kakao.maps.LatLng(destination.lat, destination.lng);
+      destOverlayRef.current = new kakao.maps.CustomOverlay({
+        position: destPos,
+        content: buildPin("🏁", "#221c2b"),
+        yAnchor: 0.5,
+      });
+      destOverlayRef.current.setMap(mapRef.current);
+    }
 
     // 이미 도착한(정시/사실상 도착) 사람은 지도에 안 띄운다 — 아직 오고 있는 지각자만 실시간 추적.
-    participants
-      .filter((p) => p.status === "en_route" && p.lastCheckIn)
-      .forEach((p) => {
-        const pos = new kakao.maps.LatLng(p.lastCheckIn.lat, p.lastCheckIn.lng);
+    const lateParticipants = participants.filter((p) => p.status === "en_route" && p.lastCheckIn);
+    const currentUids = new Set(lateParticipants.map((p) => p.id));
+
+    let membershipChanged = false;
+    for (const uid of overlaysByUidRef.current.keys()) {
+      if (!currentUids.has(uid)) {
+        overlaysByUidRef.current.get(uid).setMap(null);
+        overlaysByUidRef.current.delete(uid);
+        membershipChanged = true;
+      }
+    }
+
+    lateParticipants.forEach((p) => {
+      const pos = new kakao.maps.LatLng(p.lastCheckIn.lat, p.lastCheckIn.lng);
+      const existing = overlaysByUidRef.current.get(p.id);
+      if (existing) {
+        existing.setPosition(pos);
+      } else {
         const overlay = new kakao.maps.CustomOverlay({
           position: pos,
           content: buildPin(p.nickname.slice(0, 1), LATE_COLOR),
           yAnchor: 0.5,
         });
         overlay.setMap(mapRef.current);
-        overlaysRef.current.push(overlay);
-        bounds.extend(pos);
-      });
+        overlaysByUidRef.current.set(p.id, overlay);
+        membershipChanged = true;
+      }
+    });
 
-    if (overlaysRef.current.length > 1) {
+    if (membershipChanged && lateParticipants.length > 0) {
+      const bounds = new kakao.maps.LatLngBounds();
+      bounds.extend(new kakao.maps.LatLng(destination.lat, destination.lng));
+      lateParticipants.forEach((p) => bounds.extend(new kakao.maps.LatLng(p.lastCheckIn.lat, p.lastCheckIn.lng)));
       mapRef.current.setBounds(bounds, 48);
     }
   }, [ready, destination, participants]);

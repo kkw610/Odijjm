@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import BrandLogo from "../components/BrandLogo.jsx";
+import JoinedRoomsList from "../components/JoinedRoomsList.jsx";
 
 export default function JoinPage() {
   const navigate = useNavigate();
@@ -37,6 +38,8 @@ export default function JoinPage() {
             ← 처음으로
           </Link>
         </div>
+
+        <JoinedRoomsList />
       </div>
     </div>
   );

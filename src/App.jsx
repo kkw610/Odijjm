@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage.jsx";
 import CreateGroupPage from "./pages/CreateGroupPage.jsx";
@@ -6,10 +7,19 @@ import TeamHubPage from "./pages/TeamHubPage.jsx";
 import MeetingPage from "./pages/MeetingPage.jsx";
 import NewMeetingPage from "./pages/NewMeetingPage.jsx";
 import RankingPage from "./pages/RankingPage.jsx";
+import StatsPage from "./pages/StatsPage.jsx";
 import { useAuth } from "./hooks/useAuth.js";
+import { bumpMetric } from "./services/metrics";
 
 export default function App() {
   const { uid, error } = useAuth();
+  const visitBumpedRef = useRef(false);
+
+  useEffect(() => {
+    if (!uid || visitBumpedRef.current) return;
+    visitBumpedRef.current = true;
+    bumpMetric("visits");
+  }, [uid]);
 
   if (error) {
     return (
@@ -43,6 +53,7 @@ export default function App() {
       <Route path="/t/:teamCode/new-meeting" element={<NewMeetingPage uid={uid} />} />
       <Route path="/t/:teamCode/ranking" element={<RankingPage uid={uid} />} />
       <Route path="/t/:teamCode/m/:meetingId" element={<MeetingPage uid={uid} />} />
+      <Route path="/stats" element={<StatsPage />} />
     </Routes>
   );
 }

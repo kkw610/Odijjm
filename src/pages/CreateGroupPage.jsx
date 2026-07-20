@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { createTeamWithMeeting, joinMeeting } from "../services/teamService";
-import { saveMyNickname } from "../utils/localIdentity";
+import { saveMyNickname, recordVisitedTeam } from "../utils/localIdentity";
+import { track } from "../services/analytics";
+import { bumpMetric } from "../services/metrics";
 import BrandLogo from "../components/BrandLogo.jsx";
 import DestinationPicker from "../components/DestinationPicker.jsx";
 
@@ -46,6 +48,11 @@ export default function CreateGroupPage({ uid }) {
       });
       await joinMeeting(teamCode, meetingId, uid, nickname.trim());
       saveMyNickname(teamCode, nickname.trim());
+      recordVisitedTeam(teamCode, { destinationName: destinationName.trim(), meetingTime: new Date(meetingTime).toISOString() });
+      track("create_team");
+      track("create_meeting");
+      bumpMetric("meetingsCreated");
+      bumpMetric("joins");
       navigate(`/t/${teamCode}/m/${meetingId}`);
     } catch (err) {
       setError(err.message || "모임 생성에 실패했어요. 다시 시도해주세요.");

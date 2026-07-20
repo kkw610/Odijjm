@@ -57,5 +57,12 @@ service cloud.firestore {
         }
       }
     }
+
+    // 사이트 자체 지표 대시보드(/stats)용 카운터. 민감한 사용자 데이터가 아니라 방문/생성/체크인 등
+    // 집계 숫자 하나뿐이라, 익명 로그인만 돼 있으면(앱 전체가 그렇듯) 쓰기를 허용한다.
+    match /metrics/{docId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
   }
 }
